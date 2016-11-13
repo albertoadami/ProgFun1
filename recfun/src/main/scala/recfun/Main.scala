@@ -14,13 +14,21 @@ object Main {
     * Exercise 1
     */
   def pascal(c: Int, r: Int): Int = {
-    if (r == 0) {
-      if (c == 0)
-        1
-      else
+
+    def pascalRecursive(c: Int, r: Int): Int = {
+      if (r == 0 && c == 0)
+          1
+      else if(c < 0 || c > r )
         0
-    } else
-      pascal(c - 1, r - 1) + pascal(c, r - 1)
+      else
+        pascalRecursive(c - 1, r - 1) + pascalRecursive(c, r - 1)
+
+    }
+
+    if(r < 0)
+      throw new IllegalArgumentException()
+    else
+       pascalRecursive(c, r)
   }
 
   /**
@@ -29,19 +37,18 @@ object Main {
   def balance(chars: List[Char]): Boolean = {
     def balanceTailRec(chars: List[Char], balance: Int): Boolean = {
       if (chars.isEmpty)
-        return balance == 0
+         balance == 0
+      else if (chars.head == ')') {
+              if (balance > 0)
+                balanceTailRec(chars.tail, balance - 1)
+              else
+                false
+            }
 
-      if (chars.head == ')') {
-        if (balance > 0)
-          return balanceTailRec(chars.tail, balance - 1)
-        else
-          return false
-      }
-
-      if (chars.head == '(')
-        return balanceTailRec(chars.tail, balance + 1)
-
-      balanceTailRec(chars.tail, balance)
+      else if (chars.head == '(')
+        balanceTailRec(chars.tail, balance + 1)
+      else
+        balanceTailRec(chars.tail, balance)
     }
     balanceTailRec(chars, 0)
   }
