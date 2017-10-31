@@ -77,11 +77,23 @@ object Huffman {
    */
     def times(chars: List[Char]): List[(Char, Int)] = {
 
+      def increment(acc: List[(Char, Int)], elem: Char, occ: Int): List[(Char, Int)] = {
+
+        acc find(_._1 == elem) match {
+          case Some(el) =>
+            val index = acc indexOf el
+            acc.updated(index, (el._1, el._2 + occ))
+          case None => (elem, occ) :: acc
+        }
+
+        }
+
+
       def loop(chars: List[Char], acc: List[(Char, Int)]): List[(Char, Int)] = chars match {
         case Nil => acc
         case x :: xs =>
           val (first, second) = chars span(y => y == x)
-          loop(second, (first.head, first.size) :: acc)
+          loop(second, increment(acc, first.head, first.size))
       }
 
       loop(chars, List())
@@ -118,13 +130,13 @@ object Huffman {
    */
     def combine(trees: List[CodeTree]): List[CodeTree] = {
 
-      if(trees.size < 2) trees
-
-
-      val (first, rest) = trees.splitAt(2)
-      val fork = makeCodeTree(first.head, first.tail.head)
-      (fork :: rest).sortBy(weight(_))
-
+      if(trees.size < 2)
+        trees
+      else {
+        val (first, rest) = trees.splitAt(2)
+        val fork = makeCodeTree(first.head, first.tail.head)
+        (fork :: rest).sortBy(weight(_))
+      }
     }
   
   /**
