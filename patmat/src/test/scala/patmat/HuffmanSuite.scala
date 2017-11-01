@@ -15,6 +15,10 @@ class HuffmanSuite extends FunSuite {
 
 	}
 
+  trait TestTable {
+    val table1 = List(('a', List(0, 1, 1)), ('b', List(0, 2, 2)))
+  }
+
 
   test("weight of a larger tree") {
     new TestTrees {
@@ -78,11 +82,25 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
-
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
   }
+
+  test("test table codeBits with some cases") {
+    new TestTable {
+      assert(codeBits(table1)('a') === List(0, 1, 1))
+      assert(codeBits(table1)('b') === List(0, 2, 2))
+      assert(codeBits(table1)('c') === List())
+    }
+  }
+
+  test("convert on some trees") {
+    new TestTrees {
+      assert(convert(t1) === List(('a', List(0)), ('b', List(1))))
+    }
+  }
+
 
 }
