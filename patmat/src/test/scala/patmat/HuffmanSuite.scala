@@ -43,11 +43,39 @@ class HuffmanSuite extends FunSuite {
 
   }
 
-
-
   test("combine of some leaf list") {
     val leaflist = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
     assert(combine(leaflist) === List(Fork(Leaf('e',1),Leaf('t',2),List('e', 't'),3), Leaf('x',4)))
+  }
+
+  test("decode of some lists") {
+    new TestTrees {
+      assert(decode(t1, List(0)) == "a".toList)
+      assert(decode(t1, List(1)) == "b".toList)
+      assert(decode(t2, List(0, 0)) == "a".toList)
+      assert(decode(t2, List(0, 1)) == "b".toList)
+      assert(decode(t2, List(1)) == "d".toList)
+      assert(decode(t2, List(0, 0, 0, 1)) == "ab".toList)
+      assert(decode(t2, List(0, 0, 1)) == "ad".toList)
+      assert(decode(t2, List(0, 1, 1)) == "bd".toList)
+    }
+  }
+
+  test("encode of some lists") {
+    new TestTrees {
+      assert(encode(t1)(List('a')) == List(0))
+      assert(encode(t1)(List('b')) == List(1))
+      assert(encode(t1)(List('a', 'b')) == List(0, 1))
+      assert(encode(t1)(List('b', 'a')) == List(1, 0))
+      assert(encode(t2)(List('a')) == List(0, 0))
+      assert(encode(t2)(List('b')) == List(0, 1))
+      assert(encode(t2)(List('d')) == List(1))
+      assert(encode(t2)(List('a', 'b')) == List(0, 0, 0, 1))
+      assert(encode(t2)(List('a', 'd')) == List(0, 0, 1))
+      assert(encode(t2)(List('b', 'd')) == List(0, 1, 1))
+      assert(encode(t2)(List('a', 'b', 'd')) == List(0, 0, 0, 1, 1))
+
+    }
   }
 
 

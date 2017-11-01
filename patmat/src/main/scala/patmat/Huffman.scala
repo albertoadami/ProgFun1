@@ -181,20 +181,28 @@ object Huffman {
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-    def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
-      val originalTree = tree
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
 
-      def decode1(tree: CodeTree, bits: List[Bit]): List[Char] =
-        (bits, tree) match {
-          case (bit :: rest, Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int)) =>
-            if (bit == 1) decode1(right, rest) else decode1(left, rest)
-          case (_, Leaf(char, weight)) => char :: decode1(originalTree, bits)
-          case (_, _) => Nil
-        }
+    val orign = tree
 
-      decode1(tree, bits)
+
+    def decodeTail(tree: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = (bits, tree) match {
+      case (b :: rest, Fork(l, r, _, _)) =>
+        if(b == 1) decodeTail(r, rest, acc)
+        else decodeTail(l, rest, acc)
+      case (_, Leaf(c, _)) =>
+        decodeTail(orign, bits, acc ::: List(c))
+      case (_, _) =>
+        acc
     }
-  
+
+    if(bits.isEmpty)
+      Nil
+    else
+      decodeTail(orign, bits, List())
+
+  }
+
   /**
    * A Huffman coding tree for the French language.
    * Generated from the data given at
@@ -221,13 +229,23 @@ object Huffman {
    * into a sequence of bits.
    */
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
-    def encode1(tree:CodeTree, oc:Char):List[Bit] = tree match {
-      case Fork(left, right, _, _) =>
-        if(chars(left).contains(oc)) 0::encode1(left, oc) else 1::encode1(right,oc)
-      case _ => Nil
+
+    val origin = tree
+
+    def tailEncode(tree: CodeTree, text: Char, acc: List[Bit]): List[Bit] = tree match {
+      case Fork(l, r, _, _) =>
+        if(chars(l).contains(text)) tailEncode(l, text, acc ::: List(0))
+        else tailEncode(r, text, acc ::: List(1))
+      case Leaf(_, _) => acc
     }
-    text.foldLeft(List[Bit]())((acc,n)=>acc ++ encode1(tree, n))
+
+
+    if(text.isEmpty) Nil
+    else text flatMap(el => tailEncode(origin, el, List()))
+
   }
+
+
   // Part 4b: Encoding using code table
 
   type CodeTable = List[(Char, List[Bit])]
